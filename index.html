@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="sa" data-theme="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gaṇapati Atharvaśīrṣa — Recite Along</title>
+<meta name="description" content="The Gaṇapati Atharvaśīrṣa with Sanskrit, phonetics and English meaning, scrolling in time with a recorded recitation.">
+<meta name="theme-color" content="#7B1341">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='78' x='50' font-size='78' text-anchor='middle'%3E%F0%9F%95%89%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit:ital@0;1&family=Marcellus&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<a class="skip" href="#text">Skip to the text</a>
+
+<!-- ===================== festive garland across the top ===================== -->
+<div class="torana" id="torana" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" id="brandMark" aria-hidden="true"></span>
+    <span class="brand-text">
+      <b>श्रीगणपत्यथर्वशीर्षम्</b>
+      <i>Gaṇapati Atharvaśīrṣa</i>
+    </span>
+  </div>
+  <div class="tools">
+    <button class="tool" id="btnPhon" aria-pressed="false" title="Show the phonetic reading (p)">
+      <span aria-hidden="true">अ→a</span><span class="lbl">Phonetics</span>
+    </button>
+    <button class="tool" id="btnEng" aria-pressed="true" title="Show or hide the English meaning (e)">
+      <span aria-hidden="true">EN</span><span class="lbl">Meaning</span>
+    </button>
+    <span class="tool-group" role="group" aria-label="Text size">
+      <button class="tool sq" id="btnSmaller" title="Smaller text (−)">−</button>
+      <button class="tool sq" id="btnBigger" title="Larger text (+)">+</button>
+    </span>
+    <button class="tool sq" id="btnTheme" title="Day or evening colours (t)" aria-label="Switch to evening colours">◐</button>
+    <button class="tool sq" id="btnHelp" title="Keyboard shortcuts (?)" aria-label="Help">?</button>
+  </div>
+</header>
+
+<!-- ============================== hero ============================== -->
+<section class="hero" id="hero">
+  <div class="hero-art" id="heroArt" aria-hidden="true"></div>
+  <div class="hero-copy">
+    <p class="hero-eyebrow">ॐ गं गणपतये नमः</p>
+    <h1>Gaṇapati<br><span>Atharvaśīrṣa</span></h1>
+    <p class="hero-sub">The Upaniṣad of Gaṇeśa — seventeen verses of the Atharva Veda,
+       in Sanskrit, with the meaning of every word.</p>
+    <p class="hero-credit" id="heroCredit">Recited by <b>Amma</b></p>
+    <div class="hero-actions">
+      <button class="cta" id="btnBegin">
+        <span class="cta-icon" aria-hidden="true">▶</span> Begin the recitation
+      </button>
+      <button class="ghost" id="btnRead">Just read the text</button>
+    </div>
+    <p class="hero-meta" id="heroMeta">5 min 48 s · 17 verses · 110 lines</p>
+  </div>
+  <div class="scroll-hint" aria-hidden="true"><span></span></div>
+</section>
+
+<!-- ========================= verse quick-jump ========================= -->
+<nav class="rail" id="rail" aria-label="Jump to a verse"></nav>
+
+<!-- ============================== the text ============================== -->
+<main id="text" class="text"></main>
+
+<footer class="foot">
+  <div class="foot-art" id="footArt" aria-hidden="true"></div>
+  <p class="foot-om">ॐ शान्तिः शान्तिः शान्तिः</p>
+  <p class="foot-note">
+    Sanskrit text and English meaning follow the Gaṇapati Atharvaśīrṣa as given in the
+    documents in this repository. Word-by-word meanings are offered as a study aid —
+    where a phrase can be read more than one way, the note gives the reading that fits
+    the verse.
+  </p>
+  <p class="foot-small">Made with love, for Amma&rsquo;s recitation.</p>
+</footer>
+
+<!-- ============================== player ============================== -->
+<div class="player" id="player" hidden>
+  <audio id="audio" preload="metadata"></audio>
+
+  <div class="seek" id="seek" role="slider" tabindex="0"
+       aria-label="Seek through the recitation" aria-valuemin="0" aria-valuenow="0">
+    <div class="seek-track"><div class="seek-fill" id="seekFill"></div></div>
+    <div class="seek-marks" id="seekMarks" aria-hidden="true"></div>
+    <div class="seek-head" id="seekHead" aria-hidden="true"></div>
+  </div>
+
+  <div class="player-row">
+    <div class="pg pg-left">
+      <button class="pbtn" id="btnPrev" title="Previous line (←)" aria-label="Previous line">⏮</button>
+      <button class="pbtn play" id="btnPlay" title="Play or pause (space)" aria-label="Play">▶</button>
+      <button class="pbtn" id="btnNext" title="Next line (→)" aria-label="Next line">⏭</button>
+      <span class="time"><b id="tNow">0:00</b><i>/</i><span id="tAll">5:48</span></span>
+    </div>
+
+    <div class="pg pg-mid" id="nowLine" aria-live="polite">
+      <span class="now-dev" id="nowDev"></span>
+      <span class="now-en" id="nowEn"></span>
+    </div>
+
+    <div class="pg pg-right">
+      <button class="pbtn wide" id="btnLoop" aria-pressed="false" title="Repeat this line until you have it (l)">
+        <span aria-hidden="true">↻</span><span class="lbl">Repeat line</span>
+      </button>
+      <button class="pbtn wide" id="btnFollow" aria-pressed="true" title="Let the page scroll with the voice (f)">
+        <span aria-hidden="true">⇕</span><span class="lbl">Follow</span>
+      </button>
+      <label class="rate">
+        <span class="sr">Speed</span>
+        <select id="rate">
+          <option value="0.7">0.7×</option>
+          <option value="0.85">0.85×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.15">1.15×</option>
+          <option value="1.3">1.3×</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</div>
+
+<button class="resume" id="btnResume" hidden>↓ Back to the voice</button>
+
+<!-- word meaning popover -->
+<div class="gloss" id="gloss" role="dialog" aria-label="Word meaning" hidden>
+  <div class="gloss-dev" id="glossDev"></div>
+  <div class="gloss-phon" id="glossPhon"></div>
+  <div class="gloss-mean" id="glossMean"></div>
+</div>
+
+<!-- help sheet -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-card" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2>Reciting along</h2>
+    <p class="sheet-lead">Press play and the verse being chanted lights up and scrolls itself.
+       Tap any line to jump the recording there. Tap a Sanskrit word for its meaning.</p>
+    <dl class="keys">
+      <dt>Space</dt><dd>Play or pause</dd>
+      <dt>← →</dt><dd>Previous or next line</dd>
+      <dt>L</dt><dd>Repeat the current line</dd>
+      <dt>F</dt><dd>Follow the voice while it scrolls</dd>
+      <dt>P</dt><dd>Show the phonetic reading</dd>
+      <dt>E</dt><dd>Show or hide the English meaning</dd>
+      <dt>T</dt><dd>Day or evening colours</dd>
+      <dt>+ −</dt><dd>Text size</dd>
+      <dt>Esc</dt><dd>Close this</dd>
+    </dl>
+    <button class="cta small" id="btnCloseSheet">Close</button>
+  </div>
+</div>
+
+<script src="assets/data/text.js"></script>
+<script src="assets/data/timings.js"></script>
+<script src="assets/js/art.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

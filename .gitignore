@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+lines.json
+.DS_Store
