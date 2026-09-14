@@ -10,15 +10,20 @@ dependencies. Open `index.html` and it works.
 
 ## What is in it
 
-- **The complete text** — the Śānti Pāṭha, all seventeen verses, and the
-  Phalaśruti: 110 lines in Devanagari.
+- **The text that is actually recited** — the twelve verses of the Upaniṣad,
+  71 lines in Devanagari. The opening Śānti Pāṭha and the closing Phalaśruti are
+  not on this recording, so they are not on the page; they are in git history and
+  can be restored if the audio is ever re-recorded.
 - **A simple phonetic reading** under each line, for anyone who does not read
   Devanagari. Press <kbd>P</kbd> or the *Phonetics* button.
 - **The English meaning** beside every line.
-- **Word-by-word meanings** — 339 of them. Hover a word on a computer, tap it on
+- **Word-by-word meanings** — 193 of them. Hover a word on a computer, tap it on
   a phone.
 - **Recite-along audio** with repeat-this-line, speed control from 0.7× to 1.3×,
   and tap-a-line-to-jump-there.
+- **A sync nudge** in the player (<kbd>,</kbd> and <kbd>.</kbd>) that shifts the
+  whole text against the voice in tenths of a second, so anyone can trim the last
+  of the lag to their own ear. It is remembered per browser.
 - **Day and evening colours** — marigold on ivory, or gold on deep plum for
   recitation at dusk. Press <kbd>T</kbd>.
 - Works down to phone width, prints cleanly, and respects
@@ -62,49 +67,42 @@ the text data, then publishes the repository as-is.
 
 ## About the timings
 
-The line timings can be produced two ways. The better one needs six minutes of
-your attention; the other needs none.
+`assets/data/timings.js` was built from a listener tapping along with the
+recording in `sync.html` — 70 usable taps across the 71 lines — so the line
+boundaries are where a person heard them, not where a model guessed.
 
-### Tapping along (accurate)
+What `tools/align.py --taps` does with them:
 
-Open `sync.html`, press play, and tap the big button the instant each new line
-begins. Your tap only has to pick the *right line* — it does not have to be
-precise. `tools/align.py --taps` then measures your reaction lag from the taps
-themselves, removes it, and snaps each boundary onto the exact frame where the
-voice resumes after a pause. Lines you did not tap are filled in between the taps
-either side of them, in proportion to their syllable counts, so you can let some
-go by and the result still holds.
+- **Drops taps that contradict their neighbours.** Jumping back to redo a line
+  leaves one tap stranded out of sequence; the smallest set of taps that restores
+  order is dropped and those lines are interpolated instead. One tap was dropped
+  from this recording.
+- **Subtracts a constant reaction lag** (`TAP_LAG`, 0.35 s). A listener taps after
+  hearing a line begin.
+- **Snaps a tap onto a pause only when one sits within 0.40 s** of the corrected
+  time. 12 of 70 did. This recitation is largely continuous — it has far fewer
+  audible pauses than it has lines — so a wider search would drag taps onto
+  onsets in the middle of a line. Where there is no nearby pause, the tap wins.
+- **Interpolates untapped lines** between the taps either side, by syllable count.
 
-```sh
-python3 -m http.server 8000      # then open http://localhost:8000/sync.html
-# tap through, press "Show as text", save what it shows as taps.json
-node tools/export-lines.mjs > lines.json
-python3 tools/align.py lines.json --taps taps.json
-```
-
-Published as an Artifact, the same page saves your taps straight back to Claude
-instead, so there is no file to move by hand.
-
-### The automatic estimate (what is committed now)
-
-With no taps, `tools/align.py` decodes the recording, finds the pauses, and runs
-a Viterbi search for the line boundaries that best fit both the pauses and each
-line's syllable count:
+The one number that remains a judgement call is `TAP_LAG`. Rather than have it be
+a guess baked into the data, the player's sync nudge shifts every cue at once:
+if the text consistently changes a beat late, press <kbd>,</kbd> a few times. To
+bake a different value in permanently, change `TAP_LAG` and re-run.
 
 ```sh
 pip install numpy imageio-ffmpeg
 node tools/export-lines.mjs > lines.json
-python3 tools/align.py lines.json
+python3 tools/align.py lines.json --taps taps.json
 ```
 
-**This is what `assets/data/timings.js` currently holds, and it is only an
-estimate.** The recording has about 60 pauses of 0.3 s or longer against 110
-lines, so most line breaks fall inside a continuously chanted phrase and are
-placed by syllable count rather than by an audible pause. The verse-level sync
-holds; individual lines inside a flowing phrase drift.
+`tools/tune.html` corrects individual lines by ear: play it through, press
+<kbd>S</kbd> at any line that lands wrong, then Export. It changes only the lines
+you touch.
 
-`tools/tune.html` is the third option: play it through and press <kbd>S</kbd> at
-any line that lands wrong, then Export. It changes only the lines you touch.
+Running `align.py` with no `--taps` falls back to a pure machine estimate — a
+Viterbi search over the pauses and syllable counts. That is what the site used
+before the taps existed, and it is markedly worse.
 
 ## Editing the text
 

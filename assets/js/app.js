@@ -19,6 +19,7 @@
   var loopLine = false;
   var userScrolled = false;
   var autoScrollUntil = 0;
+  var offset = 0;        // seconds to shift every cue against the voice
 
   /* ------------------------------------------------------------------ build */
 
@@ -144,13 +145,15 @@
   /* ---------------------------------------------------------------- timing */
 
   function lineStart(i) {
-    for (var k = 0; k < cues.length; k++) if (cues[k].i === i) return cues[k].t;
+    for (var k = 0; k < cues.length; k++) if (cues[k].i === i) return cues[k].t + offset;
     return null;
   }
 
   function lineEnd(i) {
     for (var k = 0; k < cues.length; k++) {
-      if (cues[k].i === i) return k + 1 < cues.length ? cues[k + 1].t : (audio.duration || Infinity);
+      if (cues[k].i === i) {
+        return k + 1 < cues.length ? cues[k + 1].t + offset : (audio.duration || Infinity);
+      }
     }
     return Infinity;
   }
@@ -161,7 +164,7 @@
     var lo = 0, hi = cues.length - 1, ans = -1;
     while (lo <= hi) {
       var mid = (lo + hi) >> 1;
-      if (cues[mid].t <= t) { ans = cues[mid].i; lo = mid + 1; } else { hi = mid - 1; }
+      if (cues[mid].t + offset <= t) { ans = cues[mid].i; lo = mid + 1; } else { hi = mid - 1; }
     }
     return ans;
   }
@@ -210,7 +213,9 @@
 
   function heroMeta(d) {
     var total = Math.round(d);
-    return Math.floor(total / 60) + ' min ' + (total % 60) + ' s · 17 verses · ' + lines.length + ' lines';
+    var verses = TEXT.sections.reduce(function (n, s) { return n + s.verses.length; }, 0);
+    return Math.floor(total / 60) + ' min ' + (total % 60) + ' s · ' +
+           verses + ' verses · ' + lines.length + ' lines';
   }
 
   function showPlayer() { $('player').hidden = false; }
@@ -275,7 +280,7 @@
         var t = TIME.cues[first.id];
         if (typeof t !== 'number') return;
         var m = document.createElement('i');
-        m.style.left = (t / d * 100) + '%';
+        m.style.left = ((t + offset) / d * 100) + '%';
         box.appendChild(m);
       });
     });
@@ -307,6 +312,21 @@
     document.body.classList.toggle('no-en', !on);
     $('btnEng').setAttribute('aria-pressed', String(on));
     PREF.set('eng', on ? '1' : '0');
+  }
+
+  function setOffset(v) {
+    offset = Math.max(-3, Math.min(3, Math.round(v * 10) / 10));
+    var label = (offset > 0 ? '+' : '') + offset.toFixed(1) + 's';
+    $('btnOffset').textContent = label;
+    $('btnOffset').classList.toggle('set', offset !== 0);
+    $('btnOffset').title = offset
+      ? 'Text shifted ' + label + ' against the voice — click to reset'
+      : 'Sync offset — click to reset';
+    PREF.set('offset', String(offset));
+    buildMarks();
+    // setActive short-circuits when the index is unchanged, which is right here:
+    // clearing `active` first would strand the previous line's highlight.
+    setActive(at(audio.currentTime), { noScroll: true });
   }
 
   var fs = 1;
@@ -464,6 +484,10 @@
     $('btnTheme').addEventListener('click', function () {
       setTheme(document.documentElement.dataset.theme === 'night' ? 'day' : 'night');
     });
+    $('btnEarlier').addEventListener('click', function () { setOffset(offset - 0.1); });
+    $('btnLater').addEventListener('click', function () { setOffset(offset + 0.1); });
+    $('btnOffset').addEventListener('click', function () { setOffset(0); });
+
     $('btnHelp').addEventListener('click', function () { $('sheet').hidden = false; });
     $('btnCloseSheet').addEventListener('click', function () { $('sheet').hidden = true; });
     $('sheet').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
@@ -481,6 +505,8 @@
       else if (k === 'p') $('btnPhon').click();
       else if (k === 'e') $('btnEng').click();
       else if (k === 't') $('btnTheme').click();
+      else if (e.key === ',') setOffset(offset - 0.1);
+      else if (e.key === '.') setOffset(offset + 0.1);
       else if (e.key === '+' || e.key === '=') setFs(fs + 0.1);
       else if (e.key === '-') setFs(fs - 0.1);
       else if (e.key === '?') $('sheet').hidden = false;
@@ -505,6 +531,7 @@
     setPhon(PREF.get('phon', '0') === '1');
     setEng(PREF.get('eng', '1') === '1');
     setFs(parseFloat(PREF.get('fs', '1')) || 1);
+    setOffset(parseFloat(PREF.get('offset', '0')) || 0);
 
     audio.src = TIME.audio || 'Ganapatyatarvasheersam.mp3';
     if (TIME.duration) $('tAll').textContent = fmt(TIME.duration);

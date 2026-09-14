@@ -54,6 +54,9 @@ DUR_W = 1.0          # weight on the duration model
 PAUSE_W = 2.0        # weight on "end this line at a pause"
 SATURATE = 0.25      # energies above this are all equally "not a pause"
 LEAD = 0.15          # highlight a line this long before its first syllable
+TAP_LAG = 0.35       # a listener taps about this long after hearing a line begin
+SNAP_WINDOW = 0.40   # only move a tap onto a pause this close to the corrected time
+SNAP_PAUSE = 0.25    # and only onto a pause at least this long
 
 
 def ffmpeg_exe():
@@ -129,38 +132,55 @@ def speech_onsets(db, min_pause=0.12):
     return np.array(onsets)
 
 
-def snap_taps(tap_frames, onsets, look_back=1.5, look_ahead=0.5):
-    """Pull each tap onto the nearest speech onset, correcting for reaction lag.
+def snap_taps(tap_frames, onsets):
+    """Correct taps for reaction lag, and refine the ones sitting on a real pause.
 
-    A listener taps after hearing the line start, so the true boundary sits
-    slightly before the tap. The lag is estimated from the taps themselves and
-    then used to choose among the onsets in the window around each one.
+    A listener taps after hearing a line start, so every tap is shifted back by a
+    constant. Only then, where a pause sits confidently close to the corrected
+    time, is the boundary moved onto it — that pause is the exact frame the voice
+    resumed. Deliberately conservative: this recitation is mostly continuous, so
+    most line breaks have no pause at all, and a wide search would drag taps onto
+    unrelated onsets in the middle of a line. When in doubt the tap wins.
     """
-    if not len(onsets):
-        return list(tap_frames), 0.0
+    lag = TAP_LAG / HOP
+    window = SNAP_WINDOW / HOP
+    out, snapped = [], 0
+    for t in tap_frames:
+        target = t - lag
+        near = onsets[(onsets >= target - window) & (onsets <= target + window)] if len(onsets) else []
+        if len(near):
+            pick = int(near[np.argmin(np.abs(near - target))])
+            if not out or pick > out[-1]:
+                out.append(pick)
+                snapped += 1
+                continue
+        out.append(max(int(target), (out[-1] + 1) if out else 0))
+    return out, snapped
 
-    def nearest(frames, lag_frames):
-        out = []
-        for t in frames:
-            lo, hi = t - look_back / HOP, t + look_ahead / HOP
-            window = onsets[(onsets >= lo) & (onsets <= hi)]
-            out.append(int(window[np.argmin(np.abs(window - (t - lag_frames)))])
-                       if len(window) else None)
-        return out
 
-    first = nearest(tap_frames, 0.25 / HOP)
-    offsets = [(t - o) * HOP for t, o in zip(tap_frames, first) if o is not None]
-    lag = float(np.median(offsets)) if offsets else 0.25
-    lag = min(max(lag, 0.0), 1.0)
+def rising(anchors):
+    """Keep the largest set of taps whose times increase with line order.
 
-    snapped, used = [], set()
-    for t, o in zip(tap_frames, nearest(tap_frames, lag / HOP)):
-        # never let two taps collapse onto one onset, and never go backwards
-        if o is None or o in used or (snapped and o <= snapped[-1]):
-            o = max(int(t - lag / HOP), (snapped[-1] + 1) if snapped else 0)
-        used.add(o)
-        snapped.append(o)
-    return snapped, lag
+    A listener who jumps back to redo a line leaves one tap stranded out of
+    sequence. Rather than trust it or guess at a correction, drop the fewest
+    taps that restore order and let the line be interpolated like any other
+    untapped one.
+    """
+    n = len(anchors)
+    best = [1] * n
+    prev = [-1] * n
+    for i in range(n):
+        for j in range(i):
+            if anchors[j][1] < anchors[i][1] and best[j] + 1 > best[i]:
+                best[i], prev[i] = best[j] + 1, j
+    end = max(range(n), key=lambda i: best[i])
+    keep = []
+    while end != -1:
+        keep.append(end)
+        end = prev[end]
+    keep = set(keep)
+    return ([a for i, a in enumerate(anchors) if i in keep],
+            [a for i, a in enumerate(anchors) if i not in keep])
 
 
 def from_taps(lines, syl, db, tap_file):
@@ -173,13 +193,17 @@ def from_taps(lines, syl, db, tap_file):
     if not anchors:
         sys.exit(f"{tap_file}: no taps matched a line id")
 
-    snapped, lag = snap_taps([t / HOP for _, t in anchors], speech_onsets(db))
-    print(f"{len(anchors)} taps; reaction lag measured at {lag:.2f}s and removed")
-    moved = np.array([abs(f * HOP - t) for (_, t), f in zip(anchors, snapped)])
-    print(f"snapped to a speech onset by {moved.mean():.2f}s on average "
-          f"(max {moved.max():.2f}s)")
+    anchors, dropped = rising(anchors)
+    for i, t in dropped:
+        print(f"dropped {lines[i]['id']} tapped at {t:.2f}s: out of order with its neighbours")
 
-    known = {i: f for (i, _), f in zip(anchors, snapped)}
+    frames, snapped = snap_taps([t / HOP for _, t in anchors],
+                                speech_onsets(db, SNAP_PAUSE))
+    print(f"{len(anchors)} taps kept; {TAP_LAG:.2f}s of reaction lag removed from each")
+    print(f"{snapped} of them sat within {SNAP_WINDOW:.2f}s of a pause and were "
+          f"moved onto it exactly; the other {len(anchors) - snapped} kept the tap")
+
+    known = {i: f for (i, _), f in zip(anchors, frames)}
 
     # Anything outside the tapped range keeps the recitation's average pace.
     speech = np.where(db >= SILENCE_DB)[0]

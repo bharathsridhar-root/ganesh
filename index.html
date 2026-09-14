@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gaṇapati Atharvaśīrṣa — Recite Along</title>
-<meta name="description" content="The Gaṇapati Atharvaśīrṣa with Sanskrit, phonetics and English meaning, scrolling in time with a recorded recitation.">
+<meta name="description" content="The Gaṇapati Atharvaśīrṣa with Sanskrit, phonetics and English meaning, scrolling in time with Umajayanthi's recitation.">
 <meta name="theme-color" content="#7B1341">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='78' x='50' font-size='78' text-anchor='middle'%3E%F0%9F%95%89%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,8 +49,8 @@
   <div class="hero-copy">
     <p class="hero-eyebrow">ॐ गं गणपतये नमः</p>
     <h1>Gaṇapati<br><span>Atharvaśīrṣa</span></h1>
-    <p class="hero-sub">The Upaniṣad of Gaṇeśa — seventeen verses of the Atharva Veda,
-       in Sanskrit, with the meaning of every word.</p>
+    <p class="hero-sub">The Upaniṣad of Gaṇeśa, in Sanskrit, with the meaning of every word —
+       the twelve verses exactly as Umajayanthi recites them.</p>
     <p class="hero-credit" id="heroCredit">In the voice of <b>Umajayanthi</b></p>
     <div class="hero-actions">
       <button class="cta" id="btnBegin">
@@ -73,10 +73,11 @@
   <div class="foot-art" id="footArt" aria-hidden="true"></div>
   <p class="foot-om">ॐ शान्तिः शान्तिः शान्तिः</p>
   <p class="foot-note">
-    Sanskrit text and English meaning follow the Gaṇapati Atharvaśīrṣa as given in the
-    documents in this repository. Word-by-word meanings are offered as a study aid —
-    where a phrase can be read more than one way, the note gives the reading that fits
-    the verse.
+    The text here is what the recording contains: the twelve verses of the Upaniṣad.
+    The opening Śānti Pāṭha and the closing Phalaśruti are not recited on this
+    recording, so they are not shown. Word-by-word meanings are offered as a study
+    aid — where a phrase can be read more than one way, the note gives the reading
+    that fits the verse.
   </p>
   <p class="foot-small">Made with love, for Umajayanthi&rsquo;s recitation.</p>
 </footer>
@@ -112,6 +113,11 @@
       <button class="pbtn wide" id="btnFollow" aria-pressed="true" title="Let the page scroll with the voice (f)">
         <span aria-hidden="true">⇕</span><span class="lbl">Follow</span>
       </button>
+      <span class="nudge" role="group" aria-label="Sync offset">
+        <button class="pbtn sm" id="btnEarlier" title="Words appear too late — shift the text earlier (,)">−</button>
+        <button class="pbtn sm val" id="btnOffset" title="Sync offset — click to reset">0.0s</button>
+        <button class="pbtn sm" id="btnLater" title="Words appear too early — shift the text later (.)">+</button>
+      </span>
       <label class="rate">
         <span class="sr">Speed</span>
         <select id="rate">
@@ -149,6 +155,7 @@
       <dt>P</dt><dd>Show the phonetic reading</dd>
       <dt>E</dt><dd>Show or hide the English meaning</dd>
       <dt>T</dt><dd>Day or evening colours</dd>
+      <dt>, .</dt><dd>Nudge the text earlier or later against the voice</dd>
       <dt>+ −</dt><dd>Text size</dd>
       <dt>Esc</dt><dd>Close this</dd>
     </dl>

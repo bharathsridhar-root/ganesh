@@ -491,6 +491,11 @@ body.show-phon .phon { display: block; }
 }
 .pbtn.play:hover { filter: brightness(1.07); color: #fff; }
 
+.nudge { display: flex; align-items: center; gap: 3px; }
+.pbtn.sm { width: 28px; height: 28px; font-size: .82rem; }
+.pbtn.sm.val { width: auto; padding: 0 8px; font-size: .72rem; font-variant-numeric: tabular-nums; }
+.pbtn.sm.val.set { background: var(--marigold); border-color: var(--marigold); color: #46170A; font-weight: 600; }
+
 .time { font-size: .78rem; color: var(--ink-faint); margin-left: 6px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .time b { color: var(--ink-soft); font-weight: 500; }
 .time i { margin: 0 3px; font-style: normal; opacity: .5; }
