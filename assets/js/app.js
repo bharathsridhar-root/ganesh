@@ -500,7 +500,8 @@
     petals();
     wire();
 
-    setTheme(PREF.get('theme', 'day'));
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(PREF.get('theme', prefersDark ? 'night' : 'day'));
     setPhon(PREF.get('phon', '0') === '1');
     setEng(PREF.get('eng', '1') === '1');
     setFs(parseFloat(PREF.get('fs', '1')) || 1);

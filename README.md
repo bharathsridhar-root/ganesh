@@ -1,7 +1,7 @@
 # Gaṇapati Atharvaśīrṣa — recite along
 
 An interactive page for the **Gaṇapati Atharvaśīrṣa** (the Gaṇapati Upaniṣad).
-Amma's recitation plays; the Sanskrit lights up line by line on the left and
+Umajayanthi's recitation plays; the Sanskrit lights up line by line on the left and
 scrolls itself, with the English meaning alongside on the right. Tap any Sanskrit
 word to see what it means.
 
@@ -53,7 +53,7 @@ the text data, then publishes the repository as-is.
 | `assets/js/art.js` | The Ganesha emblem, garland, lamps, lotus and petals, drawn as SVG paths. |
 | `assets/data/text.js` | **The text.** Sanskrit, phonetics, translation, word meanings. Edit this to correct anything. |
 | `assets/data/timings.js` | When each line starts, in seconds. Generated — see below. |
-| `Ganapatyatarvasheersam.mp3` | Amma's recitation (5 min 48 s). |
+| `Ganapatyatarvasheersam.mp3` | Umajayanthi's recitation (5 min 48 s). |
 | `tools/validate.mjs` | Checks that every word gloss still lines up with its Devanagari token. |
 | `tools/align.py` | Generates `timings.js` from the audio. |
 | `tools/tune.html` | Corrects the timings by ear. |
