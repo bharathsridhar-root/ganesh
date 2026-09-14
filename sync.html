@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tap the Recitation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #1E0614;
+  --panel: #2C0A1E;
+  --panel-2: #3A0F29;
+  --ink: #FCEBD2;
+  --ink-soft: #DCAF9F;
+  --ink-faint: #A97F77;
+  --marigold: #FFC24D;
+  --gold: #FFD98A;
+  --saffron: #FF8A3D;
+  --magenta: #FF6BA8;
+  --leaf: #5FCF95;
+  --line: rgba(255, 194, 77, .20);
+  --ui: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --dev: "Tiro Devanagari Sanskrit", "Noto Serif Devanagari", "Nirmala UI", serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; font-family: var(--ui); color: var(--ink); background: var(--bg);
+  background-image: radial-gradient(900px 500px at 50% -10%, #3A0D28 0%, transparent 70%);
+  min-height: 100vh; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 18px 40px; padding-left: 18px; padding-right: 18px; }
+
+h1 { font-size: 1.05rem; margin: 0 0 3px; letter-spacing: .01em; }
+.sub { margin: 0 0 16px; font-size: .84rem; color: var(--ink-faint); line-height: 1.5; }
+
+.bar {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  padding: 11px 14px; border-radius: 12px; background: var(--panel);
+  border: 1px solid var(--line); margin-bottom: 14px;
+}
+.bar .grow { flex: 1 1 auto; min-width: 0; }
+.count { font-size: .82rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.count b { color: var(--marigold); font-size: 1.05rem; }
+.clock { font-variant-numeric: tabular-nums; font-size: .82rem; color: var(--ink-faint); }
+
+button {
+  font: inherit; font-size: .84rem; font-weight: 500; cursor: pointer;
+  padding: 9px 15px; border-radius: 999px;
+  color: var(--ink-soft); background: transparent; border: 1px solid var(--line);
+}
+button:hover { background: rgba(255,194,77,.10); color: var(--ink); }
+button:disabled { opacity: .4; cursor: not-allowed; }
+button.go { background: linear-gradient(135deg, var(--saffron), var(--magenta)); border: 0; color: #fff; font-weight: 600; }
+button.on { background: var(--marigold); border-color: var(--marigold); color: #3A0F29; font-weight: 600; }
+:focus-visible { outline: 2.5px solid var(--marigold); outline-offset: 3px; }
+
+/* the stage */
+.stage {
+  border-radius: 18px; background: var(--panel); border: 1px solid var(--line);
+  padding: 20px clamp(14px, 4vw, 26px) 0; margin-bottom: 14px;
+}
+.slot { padding: 9px 0; }
+.slot .role {
+  font-size: .64rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: 5px;
+}
+.slot .dev { font-family: var(--dev); line-height: 1.7; }
+.slot .phon { font-size: .78rem; font-style: italic; color: var(--saffron); margin-top: 2px; }
+
+.slot.done { opacity: .45; }
+.slot.done .dev { font-size: 1rem; }
+.slot.now { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 14px 0; }
+.slot.now .role { color: var(--marigold); }
+.slot.now .dev { font-size: clamp(1.3rem, 5vw, 1.9rem); color: var(--gold); }
+.slot.now .phon { font-size: .92rem; }
+.slot.next { opacity: .6; }
+.slot.next .dev { font-size: 1.05rem; }
+
+/* the pad */
+.pad {
+  width: 100%; margin: 18px 0 20px; padding: 26px 20px;
+  border-radius: 16px; border: 0; cursor: pointer;
+  background: linear-gradient(135deg, var(--saffron), var(--magenta));
+  color: #fff; font-size: 1.15rem; font-weight: 700; letter-spacing: .01em;
+  box-shadow: 0 14px 34px -14px var(--magenta);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: transform .07s ease, filter .07s ease;
+}
+.pad:active { transform: scale(.985); filter: brightness(1.12); }
+.pad small { display: block; font-size: .76rem; font-weight: 500; opacity: .9; margin-top: 5px; letter-spacing: .02em; }
+.pad:disabled { background: var(--panel-2); color: var(--ink-faint); box-shadow: none; }
+
+.hint { font-size: .8rem; color: var(--ink-faint); line-height: 1.6; margin: 0 0 14px; }
+.hint kbd {
+  font: .74rem ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 5px; padding: 1px 6px; color: var(--ink-soft);
+}
+
+.status { font-size: .82rem; padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; line-height: 1.5; }
+.status.ok   { background: rgba(95,207,149,.12); border: 1px solid rgba(95,207,149,.35); color: var(--leaf); }
+.status.warn { background: rgba(255,194,77,.10); border: 1px solid var(--line); color: var(--marigold); }
+
+/* the log */
+.log { border-radius: 14px; background: var(--panel); border: 1px solid var(--line); overflow: hidden; }
+.log h2 { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-faint);
+          margin: 0; padding: 12px 14px 8px; }
+.log-rows { max-height: 320px; overflow-y: auto; }
+.r { display: grid; grid-template-columns: 62px 1fr; gap: 10px; align-items: baseline;
+     padding: 7px 14px; cursor: pointer; border-left: 3px solid transparent; }
+.r:hover { background: rgba(255,194,77,.07); }
+.r.marked { border-left-color: var(--leaf); }
+.r.here { background: rgba(255,194,77,.13); border-left-color: var(--marigold); }
+.r .t { font: .76rem ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.r.marked .t { color: var(--leaf); }
+.r .d { font-family: var(--dev); font-size: .98rem; line-height: 1.6;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+audio { width: 100%; margin-bottom: 14px; }
+textarea { width: 100%; height: 150px; margin-top: 10px; font: 11px ui-monospace, monospace;
+           background: var(--panel-2); color: var(--ink-soft); border: 1px solid var(--line);
+           border-radius: 10px; padding: 10px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Tap the recitation</h1>
+  <p class="sub">
+    Press play, listen, and tap the big button the instant each new line begins.
+    Don't worry about being a few tenths of a second late — every tap is snapped to
+    the nearest real pause in the recording afterwards, so your timing only has to
+    pick the right line, not the exact millisecond.
+  </p>
+
+  <audio id="a" controls preload="metadata"></audio>
+
+  <div class="bar">
+    <span class="count grow"><b id="nDone">0</b> of <span id="nAll">0</span> lines marked</span>
+    <span class="clock" id="clock">0:00</span>
+    <button id="undo" disabled>↶ Undo</button>
+    <button id="back">−5s</button>
+    <button id="restart">Start over</button>
+  </div>
+
+  <div class="stage">
+    <div class="slot done" id="slotPrev">
+      <div class="role">Just marked</div>
+      <div class="dev" id="prevDev">—</div>
+    </div>
+    <div class="slot now" id="slotNow">
+      <div class="role">Tap when this line begins</div>
+      <div class="dev" id="nowDev">—</div>
+      <div class="phon" id="nowPhon"></div>
+    </div>
+    <div class="slot next">
+      <div class="role">Coming next</div>
+      <div class="dev" id="nextDev">—</div>
+    </div>
+    <button class="pad" id="pad">
+      Mark this line
+      <small>or press the space bar</small>
+    </button>
+  </div>
+
+  <p class="hint">
+    <kbd>Space</kbd> mark this line · <kbd>Z</kbd> undo · <kbd>P</kbd> play or pause ·
+    <kbd>←</kbd> back five seconds. Tap any line in the list to jump the recording there
+    and carry on from that point.
+  </p>
+
+  <div class="status warn" id="status">Checking whether this page can save back to Claude…</div>
+
+  <div class="bar">
+    <button class="go grow" id="save">Save these timings</button>
+    <button id="show">Show as text</button>
+  </div>
+  <textarea id="out" readonly hidden></textarea>
+
+  <div class="log">
+    <h2>Every line</h2>
+    <div class="log-rows" id="rows"></div>
+  </div>
+</div>
+
+<script src="assets/data/text.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var a = $('a');
+  var lines = [];
+  window.GA_TEXT.sections.forEach(function (s) {
+    s.verses.forEach(function (v) { v.lines.forEach(function (l) { lines.push(l); }); });
+  });
+
+  var taps = {};        // lineId -> seconds
+  var order = [];       // lineIds in the order they were tapped, for undo
+  var at = 0;           // index of the line awaiting a tap
+  var db = null;
+  var dirty = false;
+
+  /* ------------------------------------------------------------- rendering */
+
+  function fmt(t) {
+    if (typeof t !== 'number') return '—';
+    var m = Math.floor(t / 60), s = (t % 60).toFixed(2);
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  var rows = $('rows');
+  lines.forEach(function (l, i) {
+    var r = document.createElement('div');
+    r.className = 'r';
+    r.innerHTML = '<span class="t">—</span><span class="d"></span>';
+    r.querySelector('.d').textContent = l.dev;
+    r.addEventListener('click', function () { goTo(i); });
+    rows.appendChild(r);
+    l.row = r;
+  });
+  $('nAll').textContent = lines.length;
+
+  function paintRow(i) {
+    var l = lines[i], t = taps[l.id];
+    l.row.querySelector('.t').textContent = fmt(t);
+    l.row.classList.toggle('marked', typeof t === 'number');
+    l.row.classList.toggle('here', i === at);
+  }
+
+  function paint() {
+    $('prevDev').textContent = at > 0 ? lines[at - 1].dev : '—';
+    $('nowDev').textContent = lines[at] ? lines[at].dev : 'All lines marked';
+    $('nowPhon').textContent = lines[at] ? lines[at].phon : '';
+    $('nextDev').textContent = lines[at + 1] ? lines[at + 1].dev : '—';
+    $('nDone').textContent = Object.keys(taps).length;
+    $('pad').disabled = at >= lines.length;
+    $('undo').disabled = !order.length;
+    lines.forEach(function (_, i) { paintRow(i); });
+    if (lines[at]) lines[at].row.scrollIntoView({ block: 'center' });
+  }
+
+  /* ---------------------------------------------------------------- tapping */
+
+  function mark() {
+    if (at >= lines.length) return;
+    var l = lines[at];
+    taps[l.id] = Math.round(a.currentTime * 1000) / 1000;
+    order.push(l.id);
+    at++;
+    dirty = true;
+    paint();
+    if (order.length % 12 === 0) save(true);
+  }
+
+  function undo() {
+    var id = order.pop();
+    if (!id) return;
+    delete taps[id];
+    at = lines.findIndex(function (l) { return l.id === id; });
+    dirty = true;
+    paint();
+  }
+
+  function goTo(i) {
+    at = i;
+    var t = taps[lines[i].id];
+    a.currentTime = typeof t === 'number' ? Math.max(0, t - 0.4) : a.currentTime;
+    paint();
+  }
+
+  $('pad').addEventListener('click', mark);
+  $('undo').addEventListener('click', undo);
+  $('back').addEventListener('click', function () { a.currentTime = Math.max(0, a.currentTime - 5); });
+  $('restart').addEventListener('click', function () {
+    if (!confirm('Clear every mark and start again?')) return;
+    taps = {}; order = []; at = 0; a.currentTime = 0; dirty = true; paint();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.target.matches('textarea, input, button') && e.key !== ' ') return;
+    var k = e.key.toLowerCase();
+    if (e.key === ' ') { e.preventDefault(); mark(); }
+    else if (k === 'z') { e.preventDefault(); undo(); }
+    else if (k === 'p') { e.preventDefault(); a.paused ? a.play() : a.pause(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); a.currentTime = Math.max(0, a.currentTime - 5); }
+  });
+
+  a.addEventListener('timeupdate', function () { $('clock').textContent = fmt(a.currentTime); });
+
+  /* keep the screen awake through the six minutes, where the browser allows it */
+  var lock = null;
+  a.addEventListener('play', function () {
+    if ('wakeLock' in navigator) {
+      navigator.wakeLock.request('screen').then(function (l) { lock = l; }, function () {});
+    }
+  });
+  a.addEventListener('pause', function () { if (lock) { lock.release(); lock = null; } });
+
+  /* ---------------------------------------------------------------- saving */
+
+  function payload() {
+    return {
+      taps: lines.filter(function (l) { return typeof taps[l.id] === 'number'; })
+                 .map(function (l) { return { id: l.id, t: taps[l.id] }; }),
+      markedCount: Object.keys(taps).length,
+      lineCount: lines.length,
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  function status(cls, text) {
+    var s = $('status');
+    s.className = 'status ' + cls;
+    s.textContent = text;
+  }
+
+  function save(quiet) {
+    var p = payload();
+    if (!db) {
+      if (!quiet) { $('out').hidden = false; $('out').value = JSON.stringify(p); $('out').select(); }
+      return Promise.resolve();
+    }
+    return db.doc('sync/session').set(p).then(function () {
+      dirty = false;
+      status('ok', 'Saved — ' + p.markedCount + ' of ' + p.lineCount +
+                   ' lines. Claude can read this now. Keep going, or tell Claude you are done.');
+    }, function (err) {
+      status('warn', 'Could not save (' + err.code + '). Press "Show as text" and send Claude what it shows.');
+    });
+  }
+
+  $('save').addEventListener('click', function () { save(false); });
+  $('show').addEventListener('click', function () {
+    $('out').hidden = false;
+    $('out').value = JSON.stringify(payload());
+    $('out').select();
+  });
+
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty && Object.keys(taps).length) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  /* The capability arrives late, and may never arrive (served from Amplify,
+     opened as a file). The page is fully usable either way. */
+  if (window.claude && window.claude.use) {
+    window.claude.use('db').then(function (d) {
+      db = d;
+      if (db) {
+        status('ok', 'Ready. Your taps save straight back to Claude as you go.');
+        db.doc('sync/session').get().then(function (snap) {
+          if (!snap.exists) return;
+          var prev = snap.data();
+          if (!prev.taps || !prev.taps.length) return;
+          if (!confirm('Found ' + prev.taps.length + ' marks saved earlier. Carry on from there?')) return;
+          prev.taps.forEach(function (row) { taps[row.id] = row.t; order.push(row.id); });
+          at = lines.findIndex(function (l) { return typeof taps[l.id] !== 'number'; });
+          if (at < 0) at = lines.length;
+          paint();
+        }, function () {});
+      } else {
+        status('warn', 'This copy cannot save back to Claude. Tap through anyway, then press ' +
+                       '"Show as text" and send Claude what it shows.');
+      }
+    });
+  } else {
+    status('warn', 'Opened outside Claude, so nothing saves automatically. Tap through, then press ' +
+                   '"Show as text" and send Claude what it shows.');
+  }
+
+  a.src = 'Ganapatyatarvasheersam.mp3';
+  paint();
+})();
+</script>
+</body>
+</html>

@@ -1,32 +1,51 @@
 #!/usr/bin/env node
-/* Re-wraps index.html as a single Artifact page.
+/* Re-wraps a full HTML page as an Artifact page.
  *
- * The Artifact host supplies <!doctype>, <html>, <head> and <body>, so the page
- * content is emitted directly, with the stylesheet inlined and the font link and
- * <title> moved to the top. Scripts, data and audio ship alongside as published
- * files at their existing relative paths, so nothing else has to change.
+ * The Artifact host supplies <!doctype>, <html>, <head> and <body>, so this
+ * emits the head's own contents (title, font link, styles) followed by the body
+ * content. A <link> to a stylesheet inside this repository is inlined; the
+ * Google Fonts link is kept as-is, since that host is allowed. Scripts, data and
+ * audio ship alongside as published files at their existing relative paths, so
+ * nothing in the markup has to change.
  *
- * Usage: node tools/build-artifact.mjs <output.html>
+ * Usage: node tools/build-artifact.mjs <input.html> <output.html>
  */
 import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 
-const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const css = readFileSync(new URL('../assets/css/style.css', import.meta.url), 'utf8');
+const [input, output] = process.argv.slice(2);
+if (!input || !output) {
+  console.error('usage: node tools/build-artifact.mjs <input.html> <output.html>');
+  process.exit(1);
+}
 
-const body = html.slice(html.indexOf('<body>') + '<body>'.length, html.lastIndexOf('</body>'))
-  .replace(/^\s*\n/, '');
-const fontLink = html.match(/<link href="https:\/\/fonts\.googleapis[^>]*>/)[0];
+const html = readFileSync(input, 'utf8');
+const base = dirname(resolve(input));
+
+const between = (open, close) => {
+  const a = html.indexOf(open);
+  const b = html.lastIndexOf(close);
+  if (a < 0 || b < 0) throw new Error(`${input}: no ${open} … ${close}`);
+  return html.slice(a + open.length, b);
+};
+
+/* The host's own skeleton already carries charset and viewport. */
+let head = between('<head>', '</head>')
+  .split('\n')
+  .filter((l) => !/<meta\s+charset|name="viewport"|rel="preconnect"/.test(l))
+  .join('\n');
+
+/* Inline any stylesheet that lives in this repository. */
+head = head.replace(/<link rel="stylesheet" href="([^"]+)"\s*>/g, (m, href) =>
+  /^https?:/.test(href) ? m : `<style>\n${readFileSync(resolve(base, href), 'utf8')}</style>`);
+
+const body = between('<body>', '</body>').replace(/^\s*\n/, '');
 
 /* The site's own toggle writes data-theme="day" / "night". The Artifact viewer
  * writes data-theme="dark" / "light", or nothing at all when the viewer is left
- * on "system". Map those three states onto the two palettes so the page is
- * already in the right one before the script runs. */
-const themeBridge = `
-/* --- Artifact viewer theme states --------------------------------------- */
-/* "system" stamps nothing, so only prefers-color-scheme separates the two;
-   an explicit light choice, and the page's own day setting, must both win. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]):not([data-theme="day"]) {
+ * on "system". Map those states onto the night palette so a dark viewer is in
+ * the right one before any script runs. Skipped for pages that are dark-only. */
+const NIGHT_TOKENS = `
     --bg:        #1E0614;
     --bg-2:      #3A0D28;
     --paper:     #2C0A1E;
@@ -46,27 +65,28 @@ const themeBridge = `
     --active:    rgba(255, 194, 77, .11);
     --shadow:    0 14px 40px -20px rgba(0, 0, 0, .85);
     --halo:      rgba(255, 190, 90, .30);
-    color-scheme: dark;
+    color-scheme: dark;`;
+
+let bridge = '';
+if (head.includes('[data-theme="night"]')) {
+  const selectors = head
+    .split('\n')
+    .filter((l) => l.startsWith('[data-theme="night"]'))
+    .map((l) => l.replace(/\[data-theme="night"\]/g, ':root[data-theme="dark"]'))
+    .join('\n');
+  bridge = `<style>
+/* --- Artifact viewer theme states --------------------------------------- */
+/* "system" stamps nothing on the root, so only prefers-color-scheme separates
+   the two; an explicit light choice, and the page's own day setting, must win. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="day"]) {${NIGHT_TOKENS}
   }
 }
-`.trim();
+:root[data-theme="dark"] {${NIGHT_TOKENS}
+}
+${selectors}
+</style>`;
+}
 
-/* Everything the night palette restyles by selector, not by token. */
-const nightSelectors = css
-  .split('\n')
-  .filter((l) => l.startsWith('[data-theme="night"]'))
-  .map((l) => l.replace(/\[data-theme="night"\]/g, ':root[data-theme="dark"]'))
-  .join('\n');
-
-const page = `<title>Gaṇapati Atharvaśīrṣa</title>
-${fontLink}
-<style>
-${css}
-${themeBridge}
-${nightSelectors}
-</style>
-
-${body}`;
-
-writeFileSync(process.argv[2], page);
-console.log(`wrote ${process.argv[2]} (${page.length} bytes)`);
+writeFileSync(output, `${head.trim()}\n${bridge}\n\n${body}`);
+console.log(`wrote ${output} from ${input}`);

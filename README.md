@@ -56,40 +56,55 @@ the text data, then publishes the repository as-is.
 | `Ganapatyatarvasheersam.mp3` | Umajayanthi's recitation (5 min 48 s). |
 | `tools/validate.mjs` | Checks that every word gloss still lines up with its Devanagari token. |
 | `tools/align.py` | Generates `timings.js` from the audio. |
-| `tools/tune.html` | Corrects the timings by ear. |
+| `sync.html` | Tap along with the recitation to record the real timings. |
+| `tools/tune.html` | Nudges individual timings by ear. |
 | `tools/export-lines.mjs` | Feeds the line list to the aligner. |
 
-## About the timings — please read
+## About the timings
 
-**The line timings are a machine estimate and have not been checked by ear.**
+The line timings can be produced two ways. The better one needs six minutes of
+your attention; the other needs none.
 
-`tools/align.py` decodes the recording, finds where the pauses are, and runs a
-Viterbi search for the line boundaries that best fit both the pauses and each
-line's syllable count. The recording has about 60 pauses of 0.3 s or longer, but
-the text is divided into 110 lines, so most line breaks fall inside a
-continuously chanted phrase and are placed by syllable count rather than by an
-audible pause. Expect the verse-level sync to be good and individual lines inside
-a flowing phrase to be off by a few tenths of a second here and there.
+### Tapping along (accurate)
 
-To fix that in one pass:
+Open `sync.html`, press play, and tap the big button the instant each new line
+begins. Your tap only has to pick the *right line* — it does not have to be
+precise. `tools/align.py --taps` then measures your reaction lag from the taps
+themselves, removes it, and snaps each boundary onto the exact frame where the
+voice resumes after a pause. Lines you did not tap are filled in between the taps
+either side of them, in proportion to their syllable counts, so you can let some
+go by and the result still holds.
 
 ```sh
-python3 -m http.server 8000
-# open http://localhost:8000/tools/tune.html
+python3 -m http.server 8000      # then open http://localhost:8000/sync.html
+# tap through, press "Show as text", save what it shows as taps.json
+node tools/export-lines.mjs > lines.json
+python3 tools/align.py lines.json --taps taps.json
 ```
 
-Play it through and press <kbd>S</kbd> whenever a line actually begins. Press
-Export, and paste the result over `assets/data/timings.js`. Lines you correct are
-marked in green, and the rest are left alone.
+Published as an Artifact, the same page saves your taps straight back to Claude
+instead, so there is no file to move by hand.
 
-To regenerate the estimate from scratch — after replacing the audio, say, or
-re-splitting the text:
+### The automatic estimate (what is committed now)
+
+With no taps, `tools/align.py` decodes the recording, finds the pauses, and runs
+a Viterbi search for the line boundaries that best fit both the pauses and each
+line's syllable count:
 
 ```sh
 pip install numpy imageio-ffmpeg
 node tools/export-lines.mjs > lines.json
 python3 tools/align.py lines.json
 ```
+
+**This is what `assets/data/timings.js` currently holds, and it is only an
+estimate.** The recording has about 60 pauses of 0.3 s or longer against 110
+lines, so most line breaks fall inside a continuously chanted phrase and are
+placed by syllable count rather than by an audible pause. The verse-level sync
+holds; individual lines inside a flowing phrase drift.
+
+`tools/tune.html` is the third option: play it through and press <kbd>S</kbd> at
+any line that lands wrong, then Export. It changes only the lines you touch.
 
 ## Editing the text
 
