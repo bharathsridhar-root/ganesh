@@ -24,8 +24,6 @@ dependencies. Open `index.html` and it works.
 - **A sync nudge** in the player (<kbd>,</kbd> and <kbd>.</kbd>) that shifts the
   whole text against the voice in tenths of a second, so anyone can trim the last
   of the lag to their own ear. It is remembered per browser.
-- **A background tone**: a quiet drone under the recitation, at 136.1 Hz, 432 Hz
-  or 741 Hz. See below.
 - **Settings in one sheet**, reachable from the gear in the header. On a phone the
   header is only the title and that gear; the quick toggles appear on wider
   screens as a convenience, and every setting lives in the sheet either way.
@@ -69,31 +67,6 @@ the text data, then publishes the repository as-is.
 | `sync.html` | Tap along with the recitation to record the real timings. |
 | `tools/tune.html` | Nudges individual timings by ear. |
 | `tools/export-lines.mjs` | Feeds the line list to the aligner. |
-
-## The background tone
-
-`assets/js/tone.js` generates the drone live with Web Audio rather than shipping
-an audio file, so it costs nothing to download and can be retuned while playing.
-Three pitches are offered: 136.1 Hz (the earth-year tone traditionally associated
-with Gaṇeśa), 432 Hz, and 741 Hz.
-
-It is built to stay out of the way of the voice:
-
-- **It never touches the `<audio>` element.** The recitation plays natively and is
-  not routed through Web Audio at all, so no failure in the tone code can mute
-  her, colour her, or cut out with a suspended audio context.
-- **It sounds only while the recitation plays**, fading in over 2.5 s and out over
-  1.2 s, so it is always an under-layer and never a drone on its own.
-- **Each pitch carries its own trim.** 136.1 Hz sits below a speaking voice and is
-  held at full level. 432 Hz lands in the first formant region and 741 Hz in the
-  presence band where consonants live, so both are pulled well down: measured at
-  the default level, the mixed drone peaks at about 0.022 for 136.1 Hz and 0.007
-  for 741 Hz, against a recitation that peaks near 0.42.
-- The audio context is created inside the play gesture, so nothing starts before
-  the listener asks for it.
-
-To change the ceiling, the fades or the per-pitch trims, edit the constants at the
-top of `tone.js`.
 
 ## About the timings
 

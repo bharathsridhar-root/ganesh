@@ -221,7 +221,6 @@
   function showPlayer() { $('player').hidden = false; }
 
   function play() {
-    if (window.GA_TONE) window.GA_TONE.start();   // inside the user gesture
     var p = audio.play();
     if (p && p.catch) p.catch(function () { /* autoplay blocked; the button still works */ });
   }
@@ -322,30 +321,6 @@
     document.body.classList.toggle('no-en', !on);
     pair($('btnEng'), $('sEng'), on);
     PREF.set('eng', on ? '1' : '0');
-  }
-
-  /* ------------------------------------------------------------------ tone */
-
-  function setTone(on) {
-    pair(null, $('sTone'), on);
-    PREF.set('tone', on ? '1' : '0');
-    if (window.GA_TONE) window.GA_TONE.setEnabled(on);
-  }
-
-  function setPitch(key) {
-    PREF.set('pitch', key);
-    if (window.GA_TONE) window.GA_TONE.setPitch(key);
-    var info = window.GA_TONE && window.GA_TONE.pitches[key];
-    if (info) $('sPitchNote').textContent = info.note;
-    Array.prototype.forEach.call($('sPitch').children, function (b) {
-      b.setAttribute('aria-pressed', String(b.dataset.hz === key));
-    });
-  }
-
-  function setLevel(v) {
-    PREF.set('level', String(v));
-    $('sLevel').value = String(Math.round(v * 100));
-    if (window.GA_TONE) window.GA_TONE.setLevel(v);
   }
 
   function setOffset(v) {
@@ -494,12 +469,8 @@
     audio.addEventListener('pause', function () {
       $('btnPlay').textContent = '▶';
       $('btnPlay').setAttribute('aria-label', 'Play');
-      if (window.GA_TONE) window.GA_TONE.stop();
     });
-    audio.addEventListener('ended', function () {
-      setActive(-1);
-      if (window.GA_TONE) window.GA_TONE.stop();
-    });
+    audio.addEventListener('ended', function () { setActive(-1); });
     audio.addEventListener('error', function () {
       $('nowDev').textContent = 'Recording not found';
       $('nowEn').textContent = 'Expected ' + (TIME.audio || 'the audio file') + ' beside index.html';
@@ -534,12 +505,6 @@
     $('sBigger').addEventListener('click', function () { setFs(fs + 0.1); });
     $('sSmaller').addEventListener('click', function () { setFs(fs - 0.1); });
     $('sTheme').addEventListener('click', function () { $('btnTheme').click(); });
-    $('sTone').addEventListener('click', function () { setTone(this.getAttribute('aria-pressed') !== 'true'); });
-    $('sPitch').addEventListener('click', function (e) {
-      var b = e.target.closest('[data-hz]');
-      if (b) setPitch(b.dataset.hz);
-    });
-    $('sLevel').addEventListener('input', function () { setLevel(this.value / 100); });
     $('btnCloseSheet').addEventListener('click', function () { $('sheet').hidden = true; });
     $('sheet').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
 
@@ -583,9 +548,6 @@
     setEng(PREF.get('eng', '1') === '1');
     setFs(parseFloat(PREF.get('fs', '1')) || 1);
     setOffset(parseFloat(PREF.get('offset', '0')) || 0);
-    setPitch(PREF.get('pitch', '136.1'));
-    setLevel(parseFloat(PREF.get('level', '0.45')));
-    setTone(PREF.get('tone', '1') === '1');
 
     audio.src = TIME.audio || 'Ganapatyatarvasheersam.mp3';
     if (TIME.duration) $('tAll').textContent = fmt(TIME.duration);

@@ -560,34 +560,7 @@ body.show-phon .phon { display: block; }
   gap: 14px; min-height: 44px;
 }
 .set-label { font-size: .92rem; color: var(--ink); }
-.set-note { font-size: .8rem; line-height: 1.55; color: var(--ink-faint); margin: 2px 0 10px; }
 .set-val { font-size: .8rem; color: var(--ink-soft); min-width: 42px; text-align: center; font-variant-numeric: tabular-nums; }
-
-/* Styled explicitly: the default track renders near-black on the ivory theme. */
-.range {
-  flex: 1 1 140px; max-width: 190px; height: 28px;
-  -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer;
-}
-.range::-webkit-slider-runnable-track {
-  height: 5px; border-radius: 3px;
-  background: var(--line); border: 1px solid var(--line-soft);
-}
-.range::-moz-range-track {
-  height: 5px; border-radius: 3px;
-  background: var(--line); border: 1px solid var(--line-soft);
-}
-.range::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none;
-  width: 18px; height: 18px; margin-top: -7px; border-radius: 50%;
-  background: var(--marigold); border: 2px solid var(--paper);
-  box-shadow: 0 1px 5px rgba(0, 0, 0, .25);
-}
-.range::-moz-range-thumb {
-  width: 18px; height: 18px; border-radius: 50%;
-  background: var(--marigold); border: 2px solid var(--paper);
-  box-shadow: 0 1px 5px rgba(0, 0, 0, .25);
-}
-.range::-moz-range-progress { height: 5px; border-radius: 3px; background: var(--marigold); }
 
 .keys { display: grid; grid-template-columns: auto 1fr; gap: 9px 16px; margin: 0; font-size: .9rem; }
 .keys dt {
