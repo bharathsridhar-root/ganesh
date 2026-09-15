@@ -35,6 +35,14 @@
   id: 'upanishad', name: 'The Upaniṣad', dev: 'उपनिषत्', sub: 'Verses 1 – 12',
   verses: [
 
+    V('vs0', '', 'Salutation', [
+      L('lh.1', 'हरिः ॐ ।',
+        'Hari Om',
+        'Hari Om. The salutation that opens the recitation.',
+        [['हरिः','Hari','Hari, a name of the Divine; by long custom the word with which a recitation is begun'],
+         ['ॐ','Om','the primordial sound, the whole of reality in one syllable']])
+    ]),
+
     V('v1', '१', 'Salutation', [
       L('l1.1', 'ॐ नमस्ते गणपतये ॥१॥',
         'Om namaste Ganapataye',
@@ -434,6 +442,14 @@
          ['शिवसुताय','Shiva-sutaaya','to the son of Śiva'],
          ['वरदमूर्तये','varada-moortaye','to the one whose very form is the granting of boons'],
          ['नमः','namah','salutations']])
+    ]),
+
+    V('vs1', '', 'Salutation', [
+      L('lh.2', 'हरिः ॐ ।',
+        'Hari Om',
+        'Hari Om. The same salutation, spoken again to close.',
+        [['हरिः','Hari','Hari, a name of the Divine; the recitation is sealed with the word it opened on'],
+         ['ॐ','Om','the primordial sound, returning the chant to silence']])
     ])
   ]
 },

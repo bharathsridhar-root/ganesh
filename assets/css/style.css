@@ -104,22 +104,11 @@ body {
 .art { display: block; overflow: visible; }
 
 .disc      { fill: var(--paper); stroke: var(--line); stroke-width: 1.2; }
-.g-halo    { fill: var(--halo); }
-.g-fill    { fill: var(--magenta-d); }
-.g-line    { fill: none; stroke: var(--gold); stroke-width: 2.4; stroke-linecap: round; }
-.g-eye     { fill: var(--paper); stroke: var(--gold); stroke-width: 1.4; }
-.g-tusk    { fill: var(--paper); stroke: var(--gold); stroke-width: 1.2; }
-.g-trunk   { fill: none; stroke: var(--magenta-d); stroke-width: 15; stroke-linecap: round; stroke-linejoin: round; }
-.g-jewel   { fill: var(--marigold); }
-.g-jewel-s { fill: var(--marigold); }
 .p-outer   { fill: var(--marigold); opacity: .55; }
 .p-mid     { fill: var(--magenta); opacity: .38; }
 .bead      { fill: var(--gold); opacity: .75; }
 
-[data-theme="night"] .g-fill  { fill: #6B1038; }
-[data-theme="night"] .g-trunk { stroke: #6B1038; }
-
-.art-hero { width: min(clamp(280px, 40vw, 440px), 88vw); filter: drop-shadow(0 22px 44px rgba(90, 12, 50, .28)); }
+.art-hero { width: min(clamp(280px, 38vw, 420px), 86vw); filter: drop-shadow(0 26px 46px rgba(90, 12, 50, .30)); }
 .art-mark { width: 38px; height: 38px; }
 
 .ring-outer { animation: spin 150s linear infinite; transform-origin: 120px 120px; }

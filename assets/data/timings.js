@@ -9,6 +9,7 @@
     "generated_by": "tools/align.py",
     "verified_by_ear": true,
     "cues": {
+      "lh.1": 5.07,
       "l1.1": 6.31,
       "l2.1": 8.49,
       "l2.2": 14.05,
@@ -79,7 +80,8 @@
       "l12.2": 327.49,
       "l12.3": 329.93,
       "l12.4": 332.87,
-      "l12.5": 336.85
+      "l12.5": 336.85,
+      "lh.2": 346.23
     }
   };
   if (typeof module !== 'undefined' && module.exports) { module.exports = T; }

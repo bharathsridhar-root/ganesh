@@ -10,14 +10,14 @@ dependencies. Open `index.html` and it works.
 
 ## What is in it
 
-- **The text that is actually recited** — the twelve verses of the Upaniṣad,
-  71 lines in Devanagari. The opening Śānti Pāṭha and the closing Phalaśruti are
+- **The text that is actually recited**: her Hari Om salutation, the twelve
+  verses of the Upaniṣad, and her closing Hari Om. 73 lines in Devanagari. The opening Śānti Pāṭha and the closing Phalaśruti are
   not on this recording, so they are not on the page; they are in git history and
   can be restored if the audio is ever re-recorded.
 - **A simple phonetic reading** under each line, for anyone who does not read
   Devanagari. Press <kbd>P</kbd> or the *Phonetics* button.
 - **The English meaning** beside every line.
-- **Word-by-word meanings** — 193 of them. Hover a word on a computer, tap it on
+- **Word-by-word meanings**, 197 of them. Hover a word on a computer, tap it on
   a phone.
 - **Recite-along audio** with repeat-this-line, speed control from 0.7× to 1.3×,
   and tap-a-line-to-jump-there.
@@ -47,7 +47,9 @@ JSON precisely so that the page runs from `file://` with no server.
 `amplify.yml` in the repository root is the build spec. See
 [docs/DEPLOY-AMPLIFY.md](docs/DEPLOY-AMPLIFY.md) for step-by-step instructions.
 In short: in the Amplify console choose **Host a web app**, connect this GitHub
-repository and this branch, and accept the detected `amplify.yml`. There is
+repository and the **`main`** branch, and accept the detected `amplify.yml`.
+Amplify only builds the branch it is connected to, so work living on a feature
+branch will not deploy until it is merged. There is
 nothing to compile — the build step only runs `node tools/validate.mjs` to check
 the text data, then publishes the repository as-is.
 

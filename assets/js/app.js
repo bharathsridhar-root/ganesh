@@ -213,7 +213,10 @@
 
   function heroMeta(d) {
     var total = Math.round(d);
-    var verses = TEXT.sections.reduce(function (n, s) { return n + s.verses.length; }, 0);
+    // the Hari Om salutations carry no verse number, so they are not counted
+    var verses = TEXT.sections.reduce(function (n, s) {
+      return n + s.verses.filter(function (v) { return v.num; }).length;
+    }, 0);
     return Math.floor(total / 60) + ' min ' + (total % 60) + ' s · ' +
            verses + ' verses · ' + lines.length + ' lines';
   }
