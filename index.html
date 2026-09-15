@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Gaṇapati Atharvaśīrṣa — Recite Along</title>
+<title>Gaṇapati Atharvaśīrṣa</title>
 <meta name="description" content="The Gaṇapati Atharvaśīrṣa with Sanskrit, phonetics and English meaning, scrolling in time with Umajayanthi's recitation.">
 <meta name="theme-color" content="#7B1341">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='78' x='50' font-size='78' text-anchor='middle'%3E%F0%9F%95%89%EF%B8%8F%3C/text%3E%3C/svg%3E">
@@ -28,18 +28,20 @@
     </span>
   </div>
   <div class="tools">
-    <button class="tool" id="btnPhon" aria-pressed="false" title="Show the phonetic reading (p)">
+    <button class="tool wide-only" id="btnPhon" aria-pressed="false" title="Show the phonetic reading (p)">
       <span aria-hidden="true">अ→a</span><span class="lbl">Phonetics</span>
     </button>
-    <button class="tool" id="btnEng" aria-pressed="true" title="Show or hide the English meaning (e)">
+    <button class="tool wide-only" id="btnEng" aria-pressed="true" title="Show or hide the English meaning (e)">
       <span aria-hidden="true">EN</span><span class="lbl">Meaning</span>
     </button>
-    <span class="tool-group" role="group" aria-label="Text size">
+    <span class="tool-group wide-only" role="group" aria-label="Text size">
       <button class="tool sq" id="btnSmaller" title="Smaller text (−)">−</button>
       <button class="tool sq" id="btnBigger" title="Larger text (+)">+</button>
     </span>
-    <button class="tool sq" id="btnTheme" title="Day or evening colours (t)" aria-label="Switch to evening colours">◐</button>
-    <button class="tool sq" id="btnHelp" title="Keyboard shortcuts (?)" aria-label="Help">?</button>
+    <button class="tool sq wide-only" id="btnTheme" title="Day or evening colours (t)" aria-label="Switch to evening colours">◐</button>
+    <button class="tool" id="btnHelp" title="Settings and shortcuts (?)" aria-label="Settings">
+      <span aria-hidden="true">⚙</span><span class="lbl">Settings</span>
+    </button>
   </div>
 </header>
 
@@ -49,8 +51,8 @@
   <div class="hero-copy">
     <p class="hero-eyebrow">ॐ गं गणपतये नमः</p>
     <h1>Gaṇapati<br><span>Atharvaśīrṣa</span></h1>
-    <p class="hero-sub">The Upaniṣad of Gaṇeśa, in Sanskrit, with the meaning of every word —
-       the twelve verses exactly as Umajayanthi recites them.</p>
+    <p class="hero-sub">The Upaniṣad of Gaṇeśa, in Sanskrit, with the meaning of every
+       word. Twelve verses, exactly as Umajayanthi recites them.</p>
     <p class="hero-credit" id="heroCredit">In the voice of <b>Umajayanthi</b></p>
     <div class="hero-actions">
       <button class="cta" id="btnBegin">
@@ -76,7 +78,7 @@
     The text here is what the recording contains: the twelve verses of the Upaniṣad.
     The opening Śānti Pāṭha and the closing Phalaśruti are not recited on this
     recording, so they are not shown. Word-by-word meanings are offered as a study
-    aid — where a phrase can be read more than one way, the note gives the reading
+    aid. Where a phrase can be read more than one way, the note gives the reading
     that fits the verse.
   </p>
   <p class="foot-small">Made with love, for Umajayanthi&rsquo;s recitation.</p>
@@ -114,9 +116,9 @@
         <span aria-hidden="true">⇕</span><span class="lbl">Follow</span>
       </button>
       <span class="nudge" role="group" aria-label="Sync offset">
-        <button class="pbtn sm" id="btnEarlier" title="Words appear too late — shift the text earlier (,)">−</button>
-        <button class="pbtn sm val" id="btnOffset" title="Sync offset — click to reset">0.0s</button>
-        <button class="pbtn sm" id="btnLater" title="Words appear too early — shift the text later (.)">+</button>
+        <button class="pbtn sm" id="btnEarlier" title="Words appear too late, shift the text earlier (,)">−</button>
+        <button class="pbtn sm val" id="btnOffset" title="Sync offset, click to reset">0.0s</button>
+        <button class="pbtn sm" id="btnLater" title="Words appear too early, shift the text later (.)">+</button>
       </span>
       <label class="rate">
         <span class="sr">Speed</span>
@@ -141,31 +143,83 @@
   <div class="gloss-mean" id="glossMean"></div>
 </div>
 
-<!-- help sheet -->
+<!-- settings and shortcuts -->
 <div class="sheet" id="sheet" hidden>
-  <div class="sheet-card" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+  <div class="sheet-card" role="dialog" aria-modal="true" aria-label="Settings and shortcuts">
+    <button class="sheet-x" id="btnCloseSheet" aria-label="Close">✕</button>
     <h2>Reciting along</h2>
-    <p class="sheet-lead">Press play and the verse being chanted lights up and scrolls itself.
-       Tap any line to jump the recording there. Tap a Sanskrit word for its meaning.</p>
-    <dl class="keys">
-      <dt>Space</dt><dd>Play or pause</dd>
-      <dt>← →</dt><dd>Previous or next line</dd>
-      <dt>L</dt><dd>Repeat the current line</dd>
-      <dt>F</dt><dd>Follow the voice while it scrolls</dd>
-      <dt>P</dt><dd>Show the phonetic reading</dd>
-      <dt>E</dt><dd>Show or hide the English meaning</dd>
-      <dt>T</dt><dd>Day or evening colours</dd>
-      <dt>, .</dt><dd>Nudge the text earlier or later against the voice</dd>
-      <dt>+ −</dt><dd>Text size</dd>
-      <dt>Esc</dt><dd>Close this</dd>
-    </dl>
-    <button class="cta small" id="btnCloseSheet">Close</button>
+    <p class="sheet-lead">Press play and the line being chanted lights up and scrolls itself.
+       Tap any line to send the recording there. Tap a Sanskrit word for its meaning.</p>
+
+    <section class="set">
+      <h3>Reading</h3>
+      <div class="set-row">
+        <span class="set-label">Phonetic reading</span>
+        <button class="tool twin" id="sPhon" aria-pressed="false">Off</button>
+      </div>
+      <div class="set-row">
+        <span class="set-label">English meaning</span>
+        <button class="tool twin" id="sEng" aria-pressed="true">On</button>
+      </div>
+      <div class="set-row">
+        <span class="set-label">Text size</span>
+        <span class="tool-group">
+          <button class="tool sq" id="sSmaller" aria-label="Smaller text">−</button>
+          <b class="set-val" id="sFs">100%</b>
+          <button class="tool sq" id="sBigger" aria-label="Larger text">+</button>
+        </span>
+      </div>
+      <div class="set-row">
+        <span class="set-label">Colours</span>
+        <button class="tool" id="sTheme">Daytime</button>
+      </div>
+    </section>
+
+    <section class="set">
+      <h3>Background tone</h3>
+      <p class="set-note">A quiet drone beneath the recitation. It sounds only while she is
+         chanting, and fades away when you pause.</p>
+      <div class="set-row">
+        <span class="set-label">Play the tone</span>
+        <button class="tool twin" id="sTone" aria-pressed="true">On</button>
+      </div>
+      <div class="set-row">
+        <span class="set-label">Pitch</span>
+        <span class="tool-group" id="sPitch" role="group" aria-label="Tone pitch">
+          <button class="tool" data-hz="136.1">136.1</button>
+          <button class="tool" data-hz="432">432</button>
+          <button class="tool" data-hz="741">741</button>
+        </span>
+      </div>
+      <p class="set-note" id="sPitchNote"></p>
+      <div class="set-row">
+        <span class="set-label">Level</span>
+        <input class="range" type="range" id="sLevel" min="0" max="100" step="5" value="45"
+               aria-label="Tone level">
+      </div>
+    </section>
+
+    <section class="set keys-section">
+      <h3>Keys</h3>
+      <dl class="keys">
+        <dt>Space</dt><dd>Play or pause</dd>
+        <dt>← →</dt><dd>Previous or next line</dd>
+        <dt>L</dt><dd>Repeat the current line</dd>
+        <dt>F</dt><dd>Follow the voice while it scrolls</dd>
+        <dt>, .</dt><dd>Nudge the text earlier or later against the voice</dd>
+        <dt>P</dt><dd>Show the phonetic reading</dd>
+        <dt>E</dt><dd>Show or hide the English meaning</dd>
+        <dt>T</dt><dd>Day or evening colours</dd>
+        <dt>+ −</dt><dd>Text size</dd>
+      </dl>
+    </section>
   </div>
 </div>
 
 <script src="assets/data/text.js"></script>
 <script src="assets/data/timings.js"></script>
 <script src="assets/js/art.js"></script>
+<script src="assets/js/tone.js"></script>
 <script src="assets/js/app.js"></script>
 </body>
 </html>

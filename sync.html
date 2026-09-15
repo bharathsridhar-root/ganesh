@@ -133,7 +133,7 @@ textarea { width: 100%; height: 150px; margin-top: 10px; font: 11px ui-monospace
   <h1>Tap the recitation</h1>
   <p class="sub">
     Press play, listen, and tap the big button the instant each new line begins.
-    Don't worry about being a few tenths of a second late — every tap is snapped to
+    Don't worry about being a few tenths of a second late. Every tap is snapped to
     the nearest real pause in the recording afterwards, so your timing only has to
     pick the right line, not the exact millisecond.
   </p>
@@ -151,16 +151,16 @@ textarea { width: 100%; height: 150px; margin-top: 10px; font: 11px ui-monospace
   <div class="stage">
     <div class="slot done" id="slotPrev">
       <div class="role">Just marked</div>
-      <div class="dev" id="prevDev">—</div>
+      <div class="dev" id="prevDev">·</div>
     </div>
     <div class="slot now" id="slotNow">
       <div class="role">Tap when this line begins</div>
-      <div class="dev" id="nowDev">—</div>
+      <div class="dev" id="nowDev">·</div>
       <div class="phon" id="nowPhon"></div>
     </div>
     <div class="slot next">
       <div class="role">Coming next</div>
-      <div class="dev" id="nextDev">—</div>
+      <div class="dev" id="nextDev">·</div>
     </div>
     <button class="pad" id="pad">
       Mark this line
@@ -208,7 +208,7 @@ textarea { width: 100%; height: 150px; margin-top: 10px; font: 11px ui-monospace
   /* ------------------------------------------------------------- rendering */
 
   function fmt(t) {
-    if (typeof t !== 'number') return '—';
+    if (typeof t !== 'number') return '·';
     var m = Math.floor(t / 60), s = (t % 60).toFixed(2);
     return m + ':' + (s < 10 ? '0' : '') + s;
   }
@@ -217,7 +217,7 @@ textarea { width: 100%; height: 150px; margin-top: 10px; font: 11px ui-monospace
   lines.forEach(function (l, i) {
     var r = document.createElement('div');
     r.className = 'r';
-    r.innerHTML = '<span class="t">—</span><span class="d"></span>';
+    r.innerHTML = '<span class="t">·</span><span class="d"></span>';
     r.querySelector('.d').textContent = l.dev;
     r.addEventListener('click', function () { goTo(i); });
     rows.appendChild(r);
@@ -233,10 +233,10 @@ textarea { width: 100%; height: 150px; margin-top: 10px; font: 11px ui-monospace
   }
 
   function paint() {
-    $('prevDev').textContent = at > 0 ? lines[at - 1].dev : '—';
+    $('prevDev').textContent = at > 0 ? lines[at - 1].dev : '·';
     $('nowDev').textContent = lines[at] ? lines[at].dev : 'All lines marked';
     $('nowPhon').textContent = lines[at] ? lines[at].phon : '';
-    $('nextDev').textContent = lines[at + 1] ? lines[at + 1].dev : '—';
+    $('nextDev').textContent = lines[at + 1] ? lines[at + 1].dev : '·';
     $('nDone').textContent = Object.keys(taps).length;
     $('pad').disabled = at >= lines.length;
     $('undo').disabled = !order.length;
@@ -327,7 +327,7 @@ textarea { width: 100%; height: 150px; margin-top: 10px; font: 11px ui-monospace
     }
     return db.doc('sync/session').set(p).then(function () {
       dirty = false;
-      status('ok', 'Saved — ' + p.markedCount + ' of ' + p.lineCount +
+      status('ok', 'Saved. ' + p.markedCount + ' of ' + p.lineCount +
                    ' lines. Claude can read this now. Keep going, or tell Claude you are done.');
     }, function (err) {
       status('warn', 'Could not save (' + err.code + '). Press "Show as text" and send Claude what it shows.');

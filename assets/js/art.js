@@ -7,7 +7,7 @@
 
   var NS = 'http://www.w3.org/2000/svg';
 
-  /* Petals arranged around a centre — the base of every mandala here. */
+  /* Petals arranged around a centre, the base of every mandala here. */
   function petalRing(count, rInner, rOuter, width, cls) {
     var out = '';
     for (var i = 0; i < count; i++) {
@@ -64,7 +64,7 @@
       '<path class="g-eye" d="M97 110 C102 105 110 105 114 110 C110 115 102 115 97 110Z"/>',
       '<path class="g-eye" d="M126 110 C130 105 138 105 143 110 C138 115 130 115 126 110Z"/>',
 
-      /* tusks flanking the trunk — his right one whole, the left one broken */
+      /* tusks flanking the trunk, his right one whole, the left one broken */
       '<path class="g-tusk" d="M101 133 C97 146 96 158 98 170 C102 158 104 145 106 134Z"/>',
       '<path class="g-tusk" d="M139 133 C143 142 144 149 143 155 C139 148 137 141 134 134Z"/>',
 

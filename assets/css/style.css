@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Gaṇapati Atharvaśīrṣa — festive Ganesh Chaturthi palette
+   Gaṇapati Atharvaśīrṣa, festive Ganesh Chaturthi palette
    Two themes: "day" (marigold on ivory) and "night" (gold on deep plum).
    ========================================================================== */
 
@@ -61,6 +61,11 @@
 }
 
 * { box-sizing: border-box; }
+
+button, .pill, .line, .seek {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
 
 /* `hidden` must win over the display rules below, or an invisible overlay
    (the help sheet, the gloss) keeps swallowing every click on the page. */
@@ -515,7 +520,7 @@ body.show-phon .phon { display: block; }
   animation: pop .2s ease-out;
 }
 
-/* ================================ help ================================ */
+/* =========================== settings sheet =========================== */
 
 .sheet {
   position: fixed; inset: 0; z-index: 100;
@@ -523,15 +528,68 @@ body.show-phon .phon { display: block; }
   background: rgba(40, 6, 24, .55); backdrop-filter: blur(4px);
 }
 .sheet-card {
-  width: min(460px, 100%); max-height: 86vh; overflow: auto;
+  position: relative;
+  width: min(460px, 100%); max-height: 86vh; overflow-y: auto;
   padding: 26px clamp(20px, 4vw, 30px); border-radius: 20px;
   background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow);
   animation: pop .2s ease-out;
+  overscroll-behavior: contain;
 }
-.sheet-card h2 { font-family: var(--display); font-weight: 400; font-size: 1.5rem; margin: 0 0 8px; color: var(--magenta-d); }
+.sheet-x {
+  position: absolute; top: 14px; right: 14px;
+  width: 34px; height: 34px; padding: 0; border-radius: 50%; cursor: pointer;
+  font: inherit; font-size: .9rem; line-height: 1;
+  color: var(--ink-soft); background: transparent; border: 1px solid var(--line);
+}
+.sheet-x:hover { background: var(--active); color: var(--ink); }
+.sheet-card h2 {
+  font-family: var(--display); font-weight: 400; font-size: 1.5rem;
+  margin: 0 40px 8px 0; color: var(--magenta-d);
+}
 [data-theme="night"] .sheet-card h2 { color: var(--gold); }
-.sheet-lead { font-size: .92rem; line-height: 1.6; color: var(--ink-soft); margin: 0 0 18px; }
-.keys { display: grid; grid-template-columns: auto 1fr; gap: 9px 16px; margin: 0 0 22px; font-size: .9rem; }
+.sheet-lead { font-size: .92rem; line-height: 1.6; color: var(--ink-soft); margin: 0 0 20px; }
+
+.set { margin: 0 0 22px; }
+.set h3 {
+  font-size: .68rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ink-faint); margin: 0 0 10px;
+  padding-bottom: 7px; border-bottom: 1px solid var(--line-soft);
+}
+.set-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; min-height: 44px;
+}
+.set-label { font-size: .92rem; color: var(--ink); }
+.set-note { font-size: .8rem; line-height: 1.55; color: var(--ink-faint); margin: 2px 0 10px; }
+.set-val { font-size: .8rem; color: var(--ink-soft); min-width: 42px; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* Styled explicitly: the default track renders near-black on the ivory theme. */
+.range {
+  flex: 1 1 140px; max-width: 190px; height: 28px;
+  -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer;
+}
+.range::-webkit-slider-runnable-track {
+  height: 5px; border-radius: 3px;
+  background: var(--line); border: 1px solid var(--line-soft);
+}
+.range::-moz-range-track {
+  height: 5px; border-radius: 3px;
+  background: var(--line); border: 1px solid var(--line-soft);
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 18px; height: 18px; margin-top: -7px; border-radius: 50%;
+  background: var(--marigold); border: 2px solid var(--paper);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, .25);
+}
+.range::-moz-range-thumb {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--marigold); border: 2px solid var(--paper);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, .25);
+}
+.range::-moz-range-progress { height: 5px; border-radius: 3px; background: var(--marigold); }
+
+.keys { display: grid; grid-template-columns: auto 1fr; gap: 9px 16px; margin: 0; font-size: .9rem; }
 .keys dt {
   font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .8rem;
   padding: 3px 9px; border-radius: 7px; justify-self: start;
@@ -541,27 +599,72 @@ body.show-phon .phon { display: block; }
 
 /* ============================== responsive ============================== */
 
+/* Quick toggles in the header are a wide-screen convenience; on a phone the
+   same settings live in the sheet, so the header stays down to two controls. */
+@media (max-width: 760px) {
+  .wide-only { display: none !important; }
+}
+
 @media (max-width: 900px) {
-  :root { --player-h: 148px; }
+  :root { --player-h: 132px; }
   .line { grid-template-columns: 1fr; gap: 6px; }
-  .eng { padding-top: 2px; padding-left: 2px; border-left: 2px solid var(--line-soft); padding-left: 11px; }
-  .player-row { grid-template-columns: 1fr; gap: 8px; }
+  .eng { padding-top: 2px; padding-left: 11px; border-left: 2px solid var(--line-soft); }
+  .player-row { grid-template-columns: 1fr; gap: 6px; }
   .pg-mid { order: -1; }
   .pg-left, .pg-right { justify-content: center; }
 }
 
 @media (max-width: 620px) {
-  :root { --topbar-h: 54px; --player-h: 150px; }
+  :root { --topbar-h: 54px; --player-h: 138px; --wrap: 100%; }
+
   .brand-text i { display: none; }
   .tool .lbl { display: none; }
-  .tool { padding: 7px 10px; }
-  .torana { height: 56px; }
-  .hero { min-height: auto; padding-top: 96px; }
+  .tool { padding: 9px 11px; }
+
+  .torana { height: 52px; }
+
+  /* the opening should not cost a whole screen before the text starts */
+  .hero { min-height: auto; padding: 84px 18px 44px; gap: 22px; }
+  .art-hero { width: min(62vw, 250px); }
+  .hero h1 { font-size: clamp(2.1rem, 11vw, 3rem); }
+  .hero-sub { font-size: .98rem; }
+  .hero-actions { width: 100%; }
+  .cta, .ghost { flex: 1 1 auto; justify-content: center; }
+  .scroll-hint { display: none; }
+
+  .text { padding: 20px 14px 30px; }
+  .verse { border-radius: 14px; padding: 15px 14px; }
+  .line { margin: 0 -8px; padding: 12px 8px; }
+  .sec-head { margin-top: 30px; }
+
+  /* one tidy row of transport, one of options */
   .now-en { display: none; }
+  .pbtn { width: 40px; height: 40px; }
+  .pbtn.play { width: 50px; height: 50px; }
+  .pbtn.wide { width: 40px; padding: 0; }
   .pbtn.wide .lbl { display: none; }
-  .pbtn.wide { width: 38px; padding: 0; }
-  .verse { border-radius: 14px; }
-  .sec-head { margin-top: 34px; }
+  .pbtn.sm { width: 34px; height: 34px; }
+  .pbtn.sm.val { width: auto; min-width: 46px; }
+  .rate select { padding: 10px 8px; }
+  .pg-right { flex-wrap: wrap; gap: 6px; }
+
+  /* the settings sheet reads better rising from the bottom edge */
+  .sheet { place-items: end stretch; padding: 0; }
+  .sheet-card {
+    width: 100%; max-height: 92vh; border-radius: 20px 20px 0 0;
+    padding: 22px 18px calc(22px + env(safe-area-inset-bottom));
+    animation: rise .22s ease-out;
+  }
+  .keys { font-size: .85rem; }
+}
+
+@keyframes rise { from { transform: translateY(24px); opacity: 0; } }
+
+/* Coarse pointers get targets they can actually hit. */
+@media (pointer: coarse) {
+  .tool.sq { width: 40px; height: 40px; }
+  .pill { height: 36px; padding: 0 13px; }
+  .sheet-x { width: 40px; height: 40px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
